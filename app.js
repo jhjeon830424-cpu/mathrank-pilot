@@ -832,35 +832,86 @@ function generateSession(grade, rating) {
   return session;
 }
 
-/* ---------- 프로필 저장 (localStorage, 접근 불가 시 메모리로 폴백) ---------- */
-const STORAGE_KEY = 'mathrank_profile_v1';
+/* ---------- 프로필 저장 (localStorage, 접근 불가 시 메모리로 폴백) ----------
+   한 기기를 여러 명이 같이 쓸 수 있으므로, 닉네임으로 구분되는 로컬 프로필을
+   여러 개 저장한다. 서버/계정 없이 전부 이 기기의 브라우저 안에만 저장됨. */
+const PROFILES_KEY = 'mathrank_profiles_v1';
+const ACTIVE_ID_KEY = 'mathrank_active_profile_id_v1';
+const LEGACY_STORAGE_KEY = 'mathrank_profile_v1'; // 이전 단일 프로필 버전 (마이그레이션용)
 let storageAvailable = true;
-function loadProfile() {
+
+function loadAllProfiles() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
+    const raw = localStorage.getItem(PROFILES_KEY);
+    return raw ? JSON.parse(raw) : [];
   } catch (e) {
     storageAvailable = false;
-    return null;
+    return [];
   }
 }
-function saveProfile(p) {
+function saveAllProfiles(list) {
   if (!storageAvailable) return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    localStorage.setItem(PROFILES_KEY, JSON.stringify(list));
   } catch (e) {
     storageAvailable = false;
     console.warn('저장 공간에 접근할 수 없어 이번 세션에서만 진행 상황이 유지됩니다.', e);
   }
 }
+function getActiveProfileId() {
+  try { return localStorage.getItem(ACTIVE_ID_KEY); } catch (e) { return null; }
+}
+function setActiveProfileId(id) {
+  if (!storageAvailable) return;
+  try { localStorage.setItem(ACTIVE_ID_KEY, id); } catch (e) { /* 무시 */ }
+}
+function deleteProfile(id) {
+  saveAllProfiles(loadAllProfiles().filter(p => p.id !== id));
+  if (getActiveProfileId() === id) {
+    try { localStorage.removeItem(ACTIVE_ID_KEY); } catch (e) { /* 무시 */ }
+  }
+}
+function saveProfile(p) {
+  if (!storageAvailable) return;
+  const list = loadAllProfiles();
+  const idx = list.findIndex(x => x.id === p.id);
+  if (idx >= 0) list[idx] = p; else list.push(p);
+  saveAllProfiles(list);
+  setActiveProfileId(p.id);
+}
+function migrateLegacyProfile() {
+  try {
+    const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (raw) {
+      const old = JSON.parse(raw);
+      if (loadAllProfiles().length === 0) {
+        const migrated = { ...old, id: 'legacy', nickname: '나' };
+        saveAllProfiles([migrated]);
+        setActiveProfileId('legacy');
+      }
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
+  } catch (e) { /* 마이그레이션 실패 시 그냥 새로 시작 */ }
+}
+function resolveInitialProfile() {
+  migrateLegacyProfile();
+  const list = loadAllProfiles();
+  if (list.length === 0) return { profile: null, mode: 'new' };
+  const active = list.find(p => p.id === getActiveProfileId());
+  if (active) return { profile: active, mode: 'home' };
+  if (list.length === 1) { setActiveProfileId(list[0].id); return { profile: list[0], mode: 'home' }; }
+  return { profile: null, mode: 'picker' };
+}
+
 const GRADE_ACCENT = { 1: '#ffb86b', 2: '#ff6b6b', 3: '#5ee7c0', 4: '#3ddc97', 5: '#6c8cff', 6: '#ff7ad9' };
 function applyGradeAccent(grade) {
   document.documentElement.style.setProperty('--grade-accent', GRADE_ACCENT[grade] || '#6c8cff');
 }
 
-function newProfile(grade) {
+function newProfile(grade, nickname, id) {
   return {
+    id: id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    nickname,
     grade,
     rating: START_RATING,
     streak: 0,
@@ -870,7 +921,8 @@ function newProfile(grade) {
   };
 }
 
-let profile = loadProfile();
+let profile = null;
+let onboardingMode = 'new'; // 'new' | 'change-grade'
 let currentSession = null;
 let currentIndex = 0;
 let sessionCorrect = 0;
@@ -895,6 +947,7 @@ function renderHome() {
   const badgeImg = $('#home-badge');
   badgeImg.src = t.img;
   badgeImg.alt = t.label;
+  $('#home-nickname').textContent = profile.nickname ? `${profile.nickname}님` : '';
   $('#home-tier-name').textContent = t.label;
   $('#home-rating').textContent = profile.rating;
   $('#home-streak').textContent = profile.streak;
@@ -913,7 +966,41 @@ function renderHome() {
   $('#btn-start-quiz').toggleAttribute('hidden', done);
   $('#home-done-msg').toggleAttribute('hidden', !done);
   $('#btn-change-grade').removeAttribute('hidden');
+  $('#btn-switch-profile').removeAttribute('hidden');
   showScreen('screen-home');
+}
+
+/* ---------- 프로필 선택 화면 (한 기기를 여러 명이 같이 쓸 때) ---------- */
+function renderProfilePicker() {
+  const list = loadAllProfiles();
+  const wrap = $('#profile-list');
+  wrap.innerHTML = '';
+  list.forEach(p => {
+    const t = tierForRating(p.rating);
+    const row = document.createElement('div');
+    row.className = 'profile-card';
+    row.innerHTML = `
+      <img src="${t.img}" alt="">
+      <div class="profile-card-info">
+        <div class="profile-card-name">${p.nickname || '이름없음'}</div>
+        <div class="profile-card-sub">초${p.grade} · ${t.label} · ${p.rating} RP</div>
+      </div>
+      <button class="profile-card-del" aria-label="삭제">✕</button>
+    `;
+    row.addEventListener('click', () => {
+      profile = p;
+      setActiveProfileId(p.id);
+      renderHome();
+    });
+    row.querySelector('.profile-card-del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm(`"${p.nickname}" 프로필을 삭제할까요? 되돌릴 수 없어요.`)) return;
+      deleteProfile(p.id);
+      renderProfilePicker();
+    });
+    wrap.appendChild(row);
+  });
+  showScreen('screen-profile-picker');
 }
 
 /* ---------- 등급표 화면 ---------- */
@@ -1229,6 +1316,29 @@ function openExternalBrowser() {
   }
 }
 
+/* ---------- 홈 화면 설치(PWA install) 유도 ----------
+   설치하면 링크를 다시 열 필요 없이 홈 화면 아이콘으로 바로 실행된다. */
+let deferredInstallPrompt = null;
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  maybeShowInstallBanner();
+});
+function maybeShowInstallBanner() {
+  if (isStandalone() || isInAppBrowser()) return;
+  try { if (sessionStorage.getItem('install_banner_dismissed')) return; } catch (e) { /* 무시 */ }
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (!deferredInstallPrompt && !isIOS) return;
+  $('#install-banner-text').textContent = isIOS
+    ? '하단 공유 버튼을 누르고 "홈 화면에 추가"를 선택하면 앱처럼 바로 열 수 있어요!'
+    : '홈 화면에 설치하면 다음부터 링크 없이 아이콘으로 바로 열 수 있어요!';
+  $('#btn-install-app').toggleAttribute('hidden', !deferredInstallPrompt);
+  $('#install-banner').removeAttribute('hidden');
+}
+
 /* ---------- 이벤트 바인딩 ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   try {
@@ -1243,18 +1353,53 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem('inapp_banner_dismissed', '1'); } catch (e) {}
   });
 
+  $('#btn-install-app').addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    $('#install-banner').setAttribute('hidden', '');
+  });
+  $('#btn-dismiss-install').addEventListener('click', () => {
+    $('#install-banner').setAttribute('hidden', '');
+    try { sessionStorage.setItem('install_banner_dismissed', '1'); } catch (e) {}
+  });
+
   $$('.grade-card').forEach(btn => {
     btn.addEventListener('click', () => {
       const grade = parseInt(btn.dataset.grade, 10);
-      profile = newProfile(grade);
+      if (onboardingMode === 'new') {
+        const nickname = $('#nickname-input').value.trim();
+        if (!nickname) {
+          $('#nickname-error').removeAttribute('hidden');
+          $('#nickname-input').focus();
+          return;
+        }
+        profile = newProfile(grade, nickname);
+      } else {
+        profile = newProfile(grade, profile.nickname, profile.id);
+      }
       saveProfile(profile);
       renderHome();
     });
   });
 
-  $('#btn-change-grade').addEventListener('click', () => {
+  function showOnboarding(mode) {
+    onboardingMode = mode;
+    const wrap = $('#nickname-wrap');
+    if (mode === 'new') {
+      wrap.removeAttribute('hidden');
+      $('#nickname-input').value = '';
+      $('#nickname-error').setAttribute('hidden', '');
+    } else {
+      wrap.setAttribute('hidden', '');
+    }
     showScreen('screen-onboarding');
-  });
+  }
+
+  $('#btn-change-grade').addEventListener('click', () => showOnboarding('change-grade'));
+  $('#btn-add-profile').addEventListener('click', () => showOnboarding('new'));
+  $('#btn-switch-profile').addEventListener('click', renderProfilePicker);
 
   $('#btn-start-quiz').addEventListener('click', startQuiz);
 
@@ -1312,11 +1457,16 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#btn-view-weak').addEventListener('click', renderWeak);
   $$('[data-back="home"]').forEach(btn => btn.addEventListener('click', renderHome));
 
-  // 초기 화면
-  if (profile) renderHome();
-  else showScreen('screen-onboarding');
+  // 초기 화면: 저장된 로컬 프로필 개수에 따라 홈/프로필선택/새프로필 중 하나로 진입
+  const init = resolveInitialProfile();
+  profile = init.profile;
+  if (init.mode === 'home') renderHome();
+  else if (init.mode === 'picker') renderProfilePicker();
+  else showOnboarding('new');
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+
+  setTimeout(maybeShowInstallBanner, 1500);
 });

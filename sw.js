@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathrank-v6';
+const CACHE_NAME = 'mathrank-v7';
 const APP_SHELL = [
   './',
   './index.html',

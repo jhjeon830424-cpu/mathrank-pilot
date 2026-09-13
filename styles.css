@@ -40,6 +40,7 @@ body{
   justify-content:space-between;
   padding:18px 0;
 }
+.topbar-actions{display:flex;align-items:center;gap:12px;}
 .brand{font-weight:800;font-size:18px;letter-spacing:-0.3px;display:flex;align-items:center;gap:6px;}
 .brand-logo{height:32px;width:auto;display:block;}
 .beta{
@@ -73,6 +74,56 @@ body{
 }
 #btn-open-external{background:#ffd166;color:#241a00;}
 .inapp-banner-actions .ghost-btn{background:transparent;border:1px solid #7a5a20;color:#ffd98e;}
+
+.install-banner{
+  background:linear-gradient(135deg,#1a2a4a,#101c38);
+  border-color:#3a5ca8;
+}
+.install-banner p{color:#bcd4ff;}
+#btn-install-app{background:var(--accent);color:#0b0e1a;}
+.install-banner .ghost-btn{background:transparent;border:1px solid #3a5ca8;color:#bcd4ff;}
+
+.nickname-wrap{margin-bottom:14px;}
+.nickname-input{
+  width:100%;
+  background:var(--card);
+  border:1px solid #2a2f52;
+  border-radius:14px;
+  padding:14px 16px;
+  color:var(--text);
+  font-size:15px;
+  box-sizing:border-box;
+}
+.nickname-input:focus{outline:none;border-color:var(--accent);}
+.nickname-error{color:var(--bad);font-size:12px;margin:6px 2px 0;}
+
+.home-nickname{font-size:14px;color:var(--text-dim);margin-bottom:8px;}
+
+.profile-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.profile-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:var(--card);
+  border:1px solid #2a2f52;
+  border-radius:var(--radius);
+  padding:12px 14px;
+  cursor:pointer;
+  text-align:left;
+}
+.profile-card img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.profile-card-info{flex:1;min-width:0;}
+.profile-card-name{font-weight:800;font-size:15px;}
+.profile-card-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.profile-card-del{
+  background:transparent;
+  border:none;
+  color:var(--text-dim);
+  font-size:16px;
+  cursor:pointer;
+  padding:6px;
+  flex-shrink:0;
+}
 
 .save-modal[hidden]{display:none;}
 .save-modal{

@@ -15,7 +15,10 @@
 
   <header class="topbar">
     <div class="brand"><img src="assets/logo.jpg" alt="매쓰랭크" class="brand-logo"> <span class="beta">PILOT</span></div>
-    <button id="btn-change-grade" class="link-btn" hidden>학년 변경</button>
+    <div class="topbar-actions">
+      <button id="btn-switch-profile" class="link-btn" hidden>프로필 전환</button>
+      <button id="btn-change-grade" class="link-btn" hidden>학년 변경</button>
+    </div>
   </header>
 
   <div id="inapp-banner" class="inapp-banner" hidden>
@@ -26,11 +29,23 @@
     </div>
   </div>
 
+  <div id="install-banner" class="inapp-banner install-banner" hidden>
+    <p id="install-banner-text">홈 화면에 설치하면 앱처럼 바로 열 수 있어요!</p>
+    <div class="inapp-banner-actions">
+      <button id="btn-install-app">설치하기</button>
+      <button id="btn-dismiss-install" class="ghost-btn">나중에</button>
+    </div>
+  </div>
+
   <!-- 온보딩: 학년 선택 -->
   <section id="screen-onboarding" class="screen">
     <div class="mascot-hero"><img src="assets/mascot.jpg" alt="매쓰랭크 마스코트"></div>
     <h1>우리 아이 수학, 오늘도 한 티어 올려볼까요?</h1>
     <p class="sub">하루 10문제. 무료. 풀수록 등급이 오릅니다.</p>
+    <div id="nickname-wrap" class="nickname-wrap">
+      <input id="nickname-input" type="text" maxlength="8" placeholder="이름을 입력하세요 (예: 민준)" class="nickname-input">
+      <p id="nickname-error" class="nickname-error" hidden>이름을 먼저 입력해주세요!</p>
+    </div>
     <div class="grade-pick">
       <button class="grade-card" data-grade="1">
         <div class="grade-num">초1</div>
@@ -63,8 +78,18 @@
     </div>
   </section>
 
+  <!-- 프로필 선택: 한 기기를 여러 명이 같이 쓸 때 -->
+  <section id="screen-profile-picker" class="screen" hidden>
+    <div class="mascot-hero"><img src="assets/mascot.jpg" alt="매쓰랭크 마스코트"></div>
+    <h1>누가 풀 거예요?</h1>
+    <p class="sub">이 기기에 저장된 프로필 중 하나를 골라주세요.</p>
+    <div id="profile-list" class="profile-list"></div>
+    <button id="btn-add-profile" class="cta-btn">+ 새 프로필 만들기</button>
+  </section>
+
   <!-- 홈: 티어 대시보드 -->
   <section id="screen-home" class="screen" hidden>
+    <div id="home-nickname" class="home-nickname"></div>
     <div class="tier-card" id="home-tier-card">
       <div class="tier-badge"><img id="home-badge" src="" alt=""><div class="pip-row" id="home-pips"></div></div>
       <div class="tier-info">

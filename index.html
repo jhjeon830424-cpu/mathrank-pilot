@@ -107,7 +107,7 @@
       <div class="tier-progress-label" id="home-progress-label">다음 등급까지 0 RP</div>
     </div>
 
-    <button id="btn-start-quiz" class="cta-btn">오늘의 문제 10개 풀기</button>
+    <button id="btn-start-quiz" class="cta-btn">오늘의 학습 시작하기</button>
     <p id="home-session-count" class="session-count"></p>
     <p id="home-done-msg" class="done-msg" hidden>✅ 오늘 5회를 다 풀었어요! 내일 또 만나요.</p>
 
@@ -141,6 +141,14 @@
     </div>
 
     <button class="link-btn back-link" data-back="home">← 홈으로</button>
+  </section>
+
+  <!-- 학습(튜터링) 화면: 문제를 풀기 전에 오늘의 개념을 먼저 보여준다 -->
+  <section id="screen-learn" class="screen" hidden>
+    <h2>📖 오늘의 개념</h2>
+    <p class="sub">문제 풀기 전에 핵심만 짧게 살펴봐요.</p>
+    <div id="learn-cards"></div>
+    <button id="btn-start-quiz-from-learn" class="cta-btn">문제 풀러 가기</button>
   </section>
 
   <!-- 퀴즈 화면 -->

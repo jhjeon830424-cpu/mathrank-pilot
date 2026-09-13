@@ -1046,6 +1046,7 @@ function newProfile(grade, nickname, id) {
     dailySessionDate: null,
     dailySessionCount: 0,
     categoryStats: {},
+    conceptIndex: 0,
     totalSessions: 0,
   };
 }
@@ -1240,9 +1241,37 @@ function renderWeak() {
   showScreen('screen-weak');
 }
 
+/* ---------- 튜터링(학습) 화면: 문제를 풀기 전에 오늘의 개념을 먼저 보여준다 ---------- */
+let pendingSession = null;
+
+function conceptCardHtml(cat) {
+  const concept = CONCEPTS[cat];
+  if (!concept) return '';
+  return `
+    <div class="lesson-card">
+      <p class="lesson-card-title">${CATS[cat] || cat}</p>
+      <p>${concept.tip}</p>
+      <p class="lesson-example">${concept.example}</p>
+    </div>
+  `;
+}
+
+function renderLearn() {
+  pendingSession = generateSession(profile.grade, profile.rating, profile);
+
+  const pool = GRADE_POOL[profile.grade];
+  const todayCat = pool[(profile.conceptIndex || 0) % pool.length];
+  const weak = pickWeakCategories(pool, profile.categoryStats).filter(c => c !== todayCat)[0];
+
+  const wrap = $('#learn-cards');
+  wrap.innerHTML = conceptCardHtml(todayCat) + (weak ? conceptCardHtml(weak) : '');
+
+  showScreen('screen-learn');
+}
+
 /* ---------- 퀴즈 진행 ---------- */
-function startQuiz() {
-  currentSession = generateSession(profile.grade, profile.rating, profile);
+function startQuizFromLearn() {
+  currentSession = pendingSession;
   currentIndex = 0;
   sessionCorrect = 0;
   ratingBefore = profile.rating;
@@ -1344,6 +1373,7 @@ function finishSession() {
     profile.dailySessionCount = 1;
   }
   profile.totalSessions = (profile.totalSessions || 0) + 1;
+  profile.conceptIndex = (profile.conceptIndex || 0) + 1;
   saveProfile(profile);
 
   const tierBefore = tierForRating(ratingBefore);
@@ -1622,7 +1652,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#btn-add-profile').addEventListener('click', () => showOnboarding('new'));
   $('#btn-switch-profile').addEventListener('click', renderProfilePicker);
 
-  $('#btn-start-quiz').addEventListener('click', startQuiz);
+  $('#btn-start-quiz').addEventListener('click', renderLearn);
+  $('#btn-start-quiz-from-learn').addEventListener('click', startQuizFromLearn);
 
   $('#btn-submit-answer').addEventListener('click', submitAnswer);
   $('#quiz-input').addEventListener('keydown', (e) => {

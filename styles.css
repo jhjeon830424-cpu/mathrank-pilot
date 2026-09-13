@@ -443,6 +443,19 @@ h2{font-size:20px;margin:6px 0 14px;}
 .quiz-explain p{margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--text-dim);}
 .quiz-explain-example{color:var(--text)!important;font-weight:600;}
 
+/* 학습(튜터링) 화면 */
+.lesson-card{
+  background:var(--card);
+  border:1px solid #2a2f52;
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  text-align:left;
+}
+.lesson-card-title{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--accent);}
+.lesson-card p{margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--text);}
+.lesson-card .lesson-example{color:var(--text-dim)!important;font-size:12.5px;margin-bottom:0;}
+
 .feedback-mascot{
   width:56px;
   height:56px;

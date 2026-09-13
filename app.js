@@ -1081,6 +1081,7 @@ function finishSession() {
 
   $('#btn-download-card').setAttribute('hidden', '');
   $('#btn-share-card').setAttribute('hidden', '');
+  $('#save-modal').setAttribute('hidden', '');
   clearCanvas();
 
   showScreen('screen-result');
@@ -1212,8 +1213,33 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+/* ---------- 인앱 브라우저(카카오톡 등) 감지 ---------- */
+function isInAppBrowser() {
+  return /KAKAOTALK|NAVER|Line\/|FBAN|FBAV|Instagram/i.test(navigator.userAgent);
+}
+function openExternalBrowser() {
+  if (/Android/i.test(navigator.userAgent)) {
+    const urlNoScheme = location.href.replace(/^https?:\/\//, '');
+    location.href = `intent://${urlNoScheme}#Intent;scheme=https;package=com.android.chrome;end;`;
+  } else {
+    alert('화면 아래쪽이나 오른쪽 위의 브라우저 아이콘을 눌러 "다른 브라우저로 열기"를 선택해주세요.');
+  }
+}
+
 /* ---------- 이벤트 바인딩 ---------- */
 document.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (isInAppBrowser() && !sessionStorage.getItem('inapp_banner_dismissed')) {
+      $('#inapp-banner').removeAttribute('hidden');
+    }
+  } catch (e) { /* sessionStorage 접근 불가 시 배너 생략 없이 그냥 표시 */ if (isInAppBrowser()) $('#inapp-banner').removeAttribute('hidden'); }
+
+  $('#btn-open-external').addEventListener('click', openExternalBrowser);
+  $('#btn-dismiss-banner').addEventListener('click', () => {
+    $('#inapp-banner').setAttribute('hidden', '');
+    try { sessionStorage.setItem('inapp_banner_dismissed', '1'); } catch (e) {}
+  });
+
   $$('.grade-card').forEach(btn => {
     btn.addEventListener('click', () => {
       const grade = parseInt(btn.dataset.grade, 10);
@@ -1246,16 +1272,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('#btn-download-card').addEventListener('click', () => {
     const canvas = $('#share-canvas');
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `mathrank_${todayStr()}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    });
+    // 새 탭/다운로드 방식은 iOS Safari나 카카오톡 인앱 브라우저에서 막히는 경우가 많아,
+    // 같은 화면 안에 이미지를 크게 띄우고 "길게 눌러 저장"하는 방식이 가장 안정적으로 동작한다.
+    $('#save-modal-img').src = canvas.toDataURL('image/png');
+    $('#save-modal').removeAttribute('hidden');
+  });
+
+  $('#btn-close-save-modal').addEventListener('click', () => {
+    $('#save-modal').setAttribute('hidden', '');
   });
 
   $('#btn-share-card').addEventListener('click', async () => {

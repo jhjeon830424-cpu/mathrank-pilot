@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매쓰랭크 – 수학 등급전 (파일럿)</title>
+<link rel="icon" href="assets/mascot.jpg">
+<link rel="apple-touch-icon" href="assets/mascot.jpg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1220">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand"><img src="assets/logo.jpg" alt="매쓰랭크" class="brand-logo"> <span class="beta">PILOT</span></div>
+    <button id="btn-change-grade" class="link-btn" hidden>학년 변경</button>
+  </header>
+
+  <!-- 온보딩: 학년 선택 -->
+  <section id="screen-onboarding" class="screen">
+    <div class="mascot-hero"><img src="assets/mascot.jpg" alt="매쓰랭크 마스코트"></div>
+    <h1>우리 아이 수학, 오늘도 한 티어 올려볼까요?</h1>
+    <p class="sub">하루 10문제. 무료. 풀수록 등급이 오릅니다.</p>
+    <div class="grade-pick">
+      <button class="grade-card" data-grade="1">
+        <div class="grade-num">초1</div>
+        <div class="grade-desc">수 세기 · 한두 자리 덧셈뺄셈 · 시계</div>
+      </button>
+      <button class="grade-card" data-grade="2">
+        <div class="grade-num">초2</div>
+        <div class="grade-desc">두세 자리 연산 · 곱셈구구 · 시간</div>
+      </button>
+      <button class="grade-card" data-grade="3">
+        <div class="grade-num">초3</div>
+        <div class="grade-desc">곱셈·나눗셈 · 분수 기초 · 길이</div>
+      </button>
+      <button class="grade-card" data-grade="4">
+        <div class="grade-num">초4</div>
+        <div class="grade-desc">자연수 연산 · 분수 기초 · 도형</div>
+      </button>
+      <button class="grade-card" data-grade="5">
+        <div class="grade-num">초5</div>
+        <div class="grade-desc">분수·소수 연산 · 약수와 배수</div>
+      </button>
+      <button class="grade-card" data-grade="6">
+        <div class="grade-num">초6</div>
+        <div class="grade-desc">비와 비율 · 분수 나눗셈 · 평균</div>
+      </button>
+    </div>
+    <div class="npc-tip">
+      <img src="assets/npc_owl.jpg" alt="박사 부엉이">
+      <div class="npc-tip-bubble"><b>박사 부엉이:</b> 학년을 고르면 오늘의 문제 10개가 바로 나와! 매일 풀면 계급이 쭉쭉 올라가.</div>
+    </div>
+  </section>
+
+  <!-- 홈: 티어 대시보드 -->
+  <section id="screen-home" class="screen" hidden>
+    <div class="tier-card" id="home-tier-card">
+      <div class="tier-badge"><img id="home-badge" src="" alt=""><div class="pip-row" id="home-pips"></div></div>
+      <div class="tier-info">
+        <div class="tier-name" id="home-tier-name">브론즈 3</div>
+        <div class="tier-rating"><span id="home-rating">0</span> RP</div>
+      </div>
+      <div class="streak-pill">🔥 <span id="home-streak">0</span>일 연속</div>
+    </div>
+
+    <div class="tier-progress-wrap">
+      <div class="tier-progress-bar"><div class="tier-progress-fill" id="home-progress"></div></div>
+      <div class="tier-progress-label" id="home-progress-label">다음 등급까지 0 RP</div>
+    </div>
+
+    <button id="btn-start-quiz" class="cta-btn">오늘의 문제 10개 풀기</button>
+    <p id="home-done-msg" class="done-msg" hidden>✅ 오늘 학습 완료! 내일 또 만나요.</p>
+
+    <div class="npc-tip npc-tip-fox">
+      <img src="assets/npc_fox.jpg" alt="친구 여우">
+      <div class="npc-tip-bubble"><b>친구 여우:</b> 오늘도 10문제 풀고 같이 계급 올리자!</div>
+    </div>
+
+    <div class="home-links">
+      <button id="btn-view-tiers" class="ghost-btn">전체 등급표 보기</button>
+      <button id="btn-view-weak" class="ghost-btn">취약 단원 리포트</button>
+    </div>
+  </section>
+
+  <!-- 퀴즈 화면 -->
+  <section id="screen-quiz" class="screen" hidden>
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+      <div class="quiz-progress-label"><span id="quiz-index">1</span> / 10</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-category" id="quiz-category">분수의 덧셈</div>
+      <div class="quiz-question" id="quiz-question">문제가 여기에 표시됩니다.</div>
+
+      <div id="quiz-answer-area">
+        <input type="text" id="quiz-input" inputmode="decimal" placeholder="답을 입력하세요" autocomplete="off">
+      </div>
+      <div class="quiz-hint" id="quiz-hint"></div>
+
+      <button id="btn-submit-answer" class="cta-btn">제출</button>
+    </div>
+
+    <div id="quiz-feedback" class="quiz-feedback" hidden>
+      <img id="quiz-feedback-mascot" class="feedback-mascot" src="assets/mascot.jpg" alt="">
+      <div id="quiz-feedback-text"></div>
+      <button id="btn-next-question" class="cta-btn">다음 문제 →</button>
+    </div>
+  </section>
+
+  <!-- 결과 화면 -->
+  <section id="screen-result" class="screen" hidden>
+    <div class="mascot-result"><img id="result-mascot" src="assets/mascot.jpg" alt="매쓰랭크 마스코트"></div>
+    <h2 id="result-headline">오늘의 결과</h2>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="result-stat-num" id="result-score">0/10</div>
+        <div class="result-stat-label">정답</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-num" id="result-delta">+0</div>
+        <div class="result-stat-label">RP 변화</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-num" id="result-streak">0일</div>
+        <div class="result-stat-label">연속 출석</div>
+      </div>
+    </div>
+    <div id="result-levelup" class="levelup-banner" hidden>🎉 등급 승급! <span id="levelup-tier"></span></div>
+
+    <canvas id="share-canvas" width="720" height="900"></canvas>
+
+    <div class="result-actions">
+      <button id="btn-make-card" class="cta-btn">결과 카드 만들기</button>
+      <button id="btn-download-card" class="ghost-btn" hidden>이미지 저장</button>
+      <button id="btn-share-card" class="ghost-btn" hidden>카톡/SNS로 공유</button>
+    </div>
+
+    <button id="btn-back-home" class="link-btn">홈으로</button>
+  </section>
+
+  <!-- 등급표 화면 -->
+  <section id="screen-tiers" class="screen" hidden>
+    <h2>전체 등급표</h2>
+    <div id="tier-table" class="tier-table"></div>
+    <button class="link-btn back-link" data-back="home">← 홈으로</button>
+  </section>
+
+  <!-- 취약 단원 리포트 -->
+  <section id="screen-weak" class="screen" hidden>
+    <h2>취약 단원 리포트</h2>
+    <p class="sub">지금까지 푼 문제 기준, 정답률이 낮은 단원부터 보여드려요.</p>
+    <div id="weak-list" class="weak-list"></div>
+    <button class="link-btn back-link" data-back="home">← 홈으로</button>
+  </section>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

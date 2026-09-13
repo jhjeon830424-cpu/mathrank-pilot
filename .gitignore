@@ -1,0 +1,4 @@
+serve.ps1
+upload-server.ps1
+serve.out.log
+serve.err.log

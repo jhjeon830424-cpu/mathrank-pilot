@@ -1,0 +1,15 @@
+{
+  "name": "매쓰랭크 - 수학 등급전",
+  "short_name": "매쓰랭크",
+  "description": "하루 10문제로 수학 등급을 올리는 무료 학습 앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1220",
+  "theme_color": "#0f1220",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/mascot.jpg", "sizes": "2048x2048", "type": "image/jpeg", "purpose": "any" },
+    { "src": "assets/mascot.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "assets/mascot.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ]
+}

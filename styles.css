@@ -432,6 +432,17 @@ h2{font-size:20px;margin:6px 0 14px;}
 .feedback-correct{color:var(--good);}
 .feedback-wrong{color:var(--bad);}
 
+.quiz-explain{
+  text-align:left;
+  background:var(--card-2);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:14px;
+}
+.quiz-explain h4{margin:0 0 8px;font-size:14px;}
+.quiz-explain p{margin:0 0 6px;font-size:13px;line-height:1.5;color:var(--text-dim);}
+.quiz-explain-example{color:var(--text)!important;font-weight:600;}
+
 .feedback-mascot{
   width:56px;
   height:56px;

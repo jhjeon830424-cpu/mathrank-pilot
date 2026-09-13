@@ -157,6 +157,113 @@ const CATS = {
   length_time3: '길이와 시간',
 };
 
+/* ---------- 개념 튜터링: 틀렸을 때 "왜 틀렸는지" 바로 설명해주는 미니 강의 ----------
+   문제만 반복해서는 모르는 건 계속 모른 채로 남기 때문에, 오답 즉시 핵심 개념과
+   풀이 순서를 보여준다. (오답 확인 → 이해 순서가 실력 향상에 가장 중요하다는
+   조사 결과를 반영) */
+const CONCEPTS = {
+  add_sub: {
+    tip: '같은 자리(일의 자리·십의 자리…)끼리 맞춰 세로로 쓰고, 일의 자리부터 차례로 더하거나 빼요. 뺄셈은 큰 수에서 작은 수를 빼야 해요.',
+    example: '예) 47 + 38 → 일의 자리 7+8=15 → 5 쓰고 1 받아올림 → 십의 자리 4+3+1=8 → 답 85',
+  },
+  mul_div: {
+    tip: '곱셈은 몇 개씩 몇 묶음인지, 나눗셈은 전체를 똑같이 나누면 하나에 몇 개인지를 구하는 거예요. 곱셈구구를 먼저 떠올려보세요.',
+    example: '예) 24 ÷ 6 → 6단 곱셈구구에서 6×4=24 이므로 답은 4',
+  },
+  frac_addsub: {
+    tip: '분모가 다르면 먼저 통분(분모를 같게 만들기)해야 더하거나 뺄 수 있어요. 분모는 그대로 두고 분자끼리만 계산해요.',
+    example: '예) 1/2 + 1/3 → 통분하면 3/6 + 2/6 = 5/6',
+  },
+  frac_muldiv: {
+    tip: '분수 곱셈은 분자는 분자끼리, 분모는 분모끼리 곱해요. 분수 나눗셈은 뒤 분수를 뒤집어(역수) 곱셈으로 바꿔서 계산해요.',
+    example: '예) 2/3 ÷ 1/2 → 1/2를 뒤집어 2/3 × 2/1 = 4/3',
+  },
+  dec_ops: {
+    tip: '소수는 소수점 자리를 맞춰서 세로로 쓰고 자연수처럼 계산한 뒤, 소수점을 그대로 내려찍어요.',
+    example: '예) 3.4 + 1.25 → 3.40 + 1.25 = 4.65',
+  },
+  gcd_lcm: {
+    tip: '최대공약수는 두 수를 공통으로 나눌 수 있는 가장 큰 수, 최소공배수는 두 수의 배수 중 공통으로 가장 작은 수예요.',
+    example: '예) 12와 18 → 공약수 1,2,3,6 중 최대공약수는 6 / 공배수 36,72… 중 최소공배수는 36',
+  },
+  ratio_percent: {
+    tip: '비율 = 비교하는 양 ÷ 기준량 이에요. 백분율(%)은 그 비율에 100을 곱한 값이에요.',
+    example: '예) 20을 50으로 나누면 비율 0.4, 백분율은 0.4×100 = 40%',
+  },
+  geometry: {
+    tip: '직사각형 넓이 = 가로×세로, 둘레 = (가로+세로)×2 예요. 삼각형 넓이 = 밑변×높이÷2 예요.',
+    example: '예) 가로 6cm, 세로 4cm 직사각형 → 넓이 6×4=24㎠, 둘레 (6+4)×2=20cm',
+  },
+  average: {
+    tip: '평균 = 모든 값을 더한 합 ÷ 값의 개수 예요.',
+    example: '예) 8, 6, 10의 평균 → (8+6+10)÷3 = 8',
+  },
+  angle: {
+    tip: '삼각형 세 각의 합은 항상 180°, 사각형 네 각의 합은 항상 360°예요. 나머지 각을 구하려면 전체에서 아는 각들을 빼요.',
+    example: '예) 삼각형에서 두 각이 50°, 60°면 나머지 각은 180-50-60=70°',
+  },
+  unit_convert: {
+    tip: '큰 단위 → 작은 단위는 곱하고, 작은 단위 → 큰 단위는 나눠요. (1m=100cm, 1kg=1000g, 1시간=60분)',
+    example: '예) 2.5m를 cm로 → 2.5×100 = 250cm',
+  },
+  add_sub_9: {
+    tip: '십의 자리와 일의 자리를 나눠서 각각 더하거나 빼요.',
+    example: '예) 23 + 14 → 십의 자리 20+10=30, 일의 자리 3+4=7 → 30+7=37',
+  },
+  compare_order: {
+    tip: '자리수가 많은 쪽이 더 큰 수예요. 자리수가 같으면 가장 높은 자리부터 하나씩 비교해요.',
+    example: '예) 452와 439 비교 → 백의 자리는 같고(4=4), 십의 자리 5>3 이므로 452가 더 커요',
+  },
+  counting_picture: {
+    tip: '하나씩 손가락이나 펜으로 짚으며 세거나, 5개·10개씩 묶어서 세면 실수가 줄어요.',
+    example: '예) 그림 13개 → 10개 묶음 1개 + 낱개 3개 = 13',
+  },
+  clock_hour: {
+    tip: '짧은바늘은 "시"를 가리키고, 긴바늘은 "분"을 가리켜요. 정각에는 긴바늘이 12를 가리켜요.',
+    example: '예) 짧은바늘이 3과 4 사이, 긴바늘이 6 → 3시 30분',
+  },
+  add_sub_carry: {
+    tip: '세로셈으로 자리를 맞춰 쓰고, 더해서 10이 넘으면 윗자리로 1을 받아올려요. 뺄셈은 윗자리에서 10을 받아내려요.',
+    example: '예) 56 + 78 → 일의자리 6+8=14 → 4쓰고 1받아올림 → 십의자리 5+7+1=13 → 답 134',
+  },
+  mult_table: {
+    tip: '곱셈구구는 "몇 개씩 몇 묶음"이에요. 같은 수를 여러 번 더하는 것과 같아요.',
+    example: '예) 7×4 → 7을 4번 더한 것 → 7+7+7+7 = 28',
+  },
+  length_basic: {
+    tip: '자의 눈금 0에서 시작해서 끝나는 눈금까지의 칸 수를 세면 길이(cm)예요.',
+    example: '예) 자로 재보니 0부터 8까지 → 길이는 8cm',
+  },
+  clock_minute: {
+    tip: '시계 긴바늘의 작은 눈금 한 칸은 1분이고, 숫자 하나 사이는 5분이에요.',
+    example: '예) 긴바늘이 숫자 4를 가리키면 4×5=20분',
+  },
+  pattern_find: {
+    tip: '앞뒤 숫자나 모양이 어떻게 바뀌는지(몇씩 커지는지/작아지는지, 무엇이 반복되는지) 살펴봐요.',
+    example: '예) 3, 6, 9, 12, ? → 3씩 커지는 규칙 → 다음은 15',
+  },
+  add_sub_big3: {
+    tip: '세 자리, 네 자리 수도 자리를 맞춰 세로로 쓰고 일의 자리부터 순서대로 받아올림/받아내림 하며 계산해요.',
+    example: '예) 385 + 476 → 일의자리 5+6=11(1받아올림) → 십의자리 8+7+1=16(1받아올림) → 백의자리 3+4+1=8 → 답 861',
+  },
+  mul_2digit: {
+    tip: '두 자리 곱셈은 뒷수를 일의 자리와 십의 자리로 나눠서 각각 곱한 뒤 더해요.',
+    example: '예) 23×14 → 23×4=92, 23×10=230 → 92+230=322',
+  },
+  division_basic: {
+    tip: '나눗셈은 곱셈의 반대예요. "얼마를 곱하면 이 수가 될까"를 생각하면 몫을 구할 수 있어요. 나누어 떨어지지 않으면 나머지가 남아요.',
+    example: '예) 17 ÷ 5 → 5×3=15 이고 17-15=2가 남음 → 몫 3, 나머지 2',
+  },
+  fraction_intro: {
+    tip: '분수는 전체를 똑같은 크기로 나눈 것 중 몇 부분을 나타내요. 분모는 전체 조각 수, 분자는 색칠한(가진) 조각 수예요.',
+    example: '예) 피자를 4조각으로 나눠 3조각을 먹었다면 3/4',
+  },
+  length_time3: {
+    tip: '1cm=10mm, 1km=1000m 처럼 큰 단위와 작은 단위 사이의 관계를 기억해두면 변환이 쉬워요. 시간은 1분=60초예요.',
+    example: '예) 2km 300m를 m로 → 2000m + 300m = 2300m',
+  },
+};
+
 function numAnswerCheck(correctVal, tolerance = 0) {
   return (input) => {
     const v = parseFloat(input.trim());
@@ -815,12 +922,32 @@ function pickLevelForRating(rp, gradeOffset) {
   return target;
 }
 
-function generateSession(grade, rating) {
+const WEAK_REVIEW_SLOTS = 2; // 취약 단원을 오늘 세션에 자동으로 섞어 복습시키는 문제 수
+
+function pickWeakCategories(pool, categoryStats) {
+  const stats = categoryStats || {};
+  return pool
+    .map(cat => ({ cat, ...(stats[cat] || { correct: 0, total: 0 }) }))
+    .filter(r => r.total >= 3 && r.correct / r.total < 0.7)
+    .sort((a, b) => (a.correct / a.total) - (b.correct / b.total))
+    .map(r => r.cat);
+}
+
+function generateSession(grade, rating, profile) {
   const pool = GRADE_POOL[grade];
   const gradeOffset = GRADE_OFFSET[grade] ?? 0;
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   const cats = [];
   while (cats.length < 10) cats.push(...shuffled);
+  cats.length = 10;
+
+  // 정답률이 낮은 단원(취약 단원)이 있으면 오늘 문제 중 일부를 그 단원으로 바꿔서
+  // 자동으로 복습되게 한다. (틀렸던 걸 다시 보지 않으면 계속 모르는 채로 남기 때문)
+  const weak = pickWeakCategories(pool, profile && profile.categoryStats);
+  for (let i = 0; i < Math.min(WEAK_REVIEW_SLOTS, weak.length); i++) {
+    cats[cats.length - 1 - i] = weak[i];
+  }
+
   const session = [];
   for (let i = 0; i < 10; i++) {
     const cat = cats[i];
@@ -1115,7 +1242,7 @@ function renderWeak() {
 
 /* ---------- 퀴즈 진행 ---------- */
 function startQuiz() {
-  currentSession = generateSession(profile.grade, profile.rating);
+  currentSession = generateSession(profile.grade, profile.rating, profile);
   currentIndex = 0;
   sessionCorrect = 0;
   ratingBefore = profile.rating;
@@ -1132,6 +1259,7 @@ function renderQuestion() {
   $('#quiz-input').value = '';
   $('#quiz-hint').textContent = p.answerType === 'fraction' ? '분수는 "3/4" 또는 대분수 "1 1/2" 형태로 입력하세요.' : '';
   $('#quiz-feedback').setAttribute('hidden', '');
+  $('#quiz-explain').setAttribute('hidden', '');
   $('#btn-submit-answer').removeAttribute('hidden');
   $('#quiz-input').removeAttribute('disabled');
   setTimeout(() => $('#quiz-input').focus(), 50);
@@ -1172,6 +1300,19 @@ function submitAnswer() {
     fbMascot.src = 'assets/char_wrong.jpg';
     fbMascot.classList.add('fb-wrong');
   }
+
+  const explain = $('#quiz-explain');
+  if (!correct) {
+    const concept = CONCEPTS[p.category];
+    if (concept) {
+      $('#quiz-explain-tip').textContent = concept.tip;
+      $('#quiz-explain-example').textContent = concept.example;
+      explain.removeAttribute('hidden');
+    }
+  } else {
+    explain.setAttribute('hidden', '');
+  }
+
   saveProfile(profile);
 }
 

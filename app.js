@@ -880,6 +880,9 @@ let ratingBefore = 0;
 function showScreen(id) {
   $$('.screen').forEach(s => s.setAttribute('hidden', ''));
   $(`#${id}`).removeAttribute('hidden');
+  // 화면 전환 시 결과 카드 모달 등 오버레이가 남아있지 않도록 항상 정리한다.
+  const modal = $('#save-modal');
+  if (modal && !modal.hasAttribute('hidden')) modal.setAttribute('hidden', '');
 }
 
 function isDoneToday() {
@@ -1280,6 +1283,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('#btn-close-save-modal').addEventListener('click', () => {
     $('#save-modal').setAttribute('hidden', '');
+  });
+  // 이미지가 아닌 배경(어두운 영역)을 눌러도 닫히도록 안전장치 추가
+  $('#save-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'save-modal') $('#save-modal').setAttribute('hidden', '');
   });
 
   $('#btn-share-card').addEventListener('click', async () => {

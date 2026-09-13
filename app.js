@@ -916,9 +916,17 @@ function newProfile(grade, nickname, id) {
     rating: START_RATING,
     streak: 0,
     lastCompletedDate: null,
+    dailySessionDate: null,
+    dailySessionCount: 0,
     categoryStats: {},
     totalSessions: 0,
   };
+}
+
+const DAILY_SESSION_LIMIT = 5; // 하루 최대 5세션(=문제 50개)까지 미리 풀 수 있음
+function sessionsCompletedToday() {
+  if (!profile || profile.dailySessionDate !== todayStr()) return 0;
+  return profile.dailySessionCount || 0;
 }
 
 let profile = null;
@@ -938,7 +946,7 @@ function showScreen(id) {
 }
 
 function isDoneToday() {
-  return profile && profile.lastCompletedDate === todayStr();
+  return sessionsCompletedToday() >= DAILY_SESSION_LIMIT;
 }
 
 /* ---------- 홈 화면 렌더 ---------- */
@@ -962,9 +970,11 @@ function renderHome() {
     : `다음 등급까지 ${t.ceil - profile.rating} RP`;
   $('#home-pips').innerHTML = pipsHtml(t.count, t.hex);
 
-  const done = isDoneToday();
+  const doneCount = sessionsCompletedToday();
+  const done = doneCount >= DAILY_SESSION_LIMIT;
   $('#btn-start-quiz').toggleAttribute('hidden', done);
   $('#home-done-msg').toggleAttribute('hidden', !done);
+  $('#home-session-count').textContent = done ? '' : `오늘 ${doneCount}/${DAILY_SESSION_LIMIT}회 완료 (하루 최대 ${DAILY_SESSION_LIMIT}회까지 미리 풀 수 있어요)`;
   $('#btn-change-grade').removeAttribute('hidden');
   $('#btn-switch-profile').removeAttribute('hidden');
   showScreen('screen-home');
@@ -1185,6 +1195,13 @@ function finishSession() {
     profile.streak = 1;
   }
   profile.lastCompletedDate = today;
+  // 하루 세션 횟수는 스트릭과 별개로 관리 (하루 최대 DAILY_SESSION_LIMIT회까지 미리 풀기 허용)
+  if (profile.dailySessionDate === today) {
+    profile.dailySessionCount = (profile.dailySessionCount || 0) + 1;
+  } else {
+    profile.dailySessionDate = today;
+    profile.dailySessionCount = 1;
+  }
   profile.totalSessions = (profile.totalSessions || 0) + 1;
   saveProfile(profile);
 

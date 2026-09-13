@@ -351,6 +351,13 @@ h2{font-size:20px;margin:6px 0 14px;}
   font-weight:700;
 }
 
+.session-count{
+  text-align:center;
+  color:var(--text-dim);
+  font-size:12px;
+  margin-top:8px;
+}
+
 .home-links{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
 .backup-link{text-align:center;margin-top:4px;}
 

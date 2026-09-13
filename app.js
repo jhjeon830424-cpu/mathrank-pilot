@@ -970,6 +970,50 @@ function renderHome() {
   showScreen('screen-home');
 }
 
+/* ---------- 백업/이어하기: 로그인 없이 기록을 코드로 옮기기 ----------
+   서버/계정 없이, 프로필 데이터를 base64 코드로 인코딩해 다른 기기에
+   붙여넣으면 그대로 이어할 수 있게 한다. */
+function encodeProfileCode(p) {
+  const json = JSON.stringify(p);
+  return 'MR1:' + btoa(unescape(encodeURIComponent(json)));
+}
+function decodeProfileCode(code) {
+  const trimmed = code.trim();
+  if (!trimmed.startsWith('MR1:')) throw new Error('형식이 올바르지 않아요');
+  const json = decodeURIComponent(escape(atob(trimmed.slice(4))));
+  const obj = JSON.parse(json);
+  if (!obj || typeof obj.rating !== 'number' || !obj.grade || !obj.id) throw new Error('올바른 백업 코드가 아니에요');
+  return obj;
+}
+function renderBackupScreen() {
+  const exportWrap = $('#backup-export-code').closest('.backup-section');
+  if (profile) {
+    exportWrap.removeAttribute('hidden');
+    $('#backup-export-code').value = encodeProfileCode(profile);
+  } else {
+    exportWrap.setAttribute('hidden', '');
+  }
+  $('#backup-import-code').value = '';
+  showScreen('screen-backup');
+}
+function importProfileFromCode(code) {
+  let obj;
+  try {
+    obj = decodeProfileCode(code);
+  } catch (e) {
+    alert('코드를 읽을 수 없어요. 코드를 정확히 복사했는지 확인해주세요.');
+    return;
+  }
+  const list = loadAllProfiles();
+  const existing = list.find(p => p.id === obj.id);
+  if (existing && !confirm(`"${obj.nickname}" 프로필이 이미 있어요. 가져온 기록으로 덮어쓸까요?`)) return;
+  profile = obj;
+  saveProfile(profile);
+  setActiveProfileId(profile.id);
+  alert(`"${obj.nickname}" 프로필을 가져왔어요!`);
+  renderHome();
+}
+
 /* ---------- 프로필 선택 화면 (한 기기를 여러 명이 같이 쓸 때) ---------- */
 function renderProfilePicker() {
   const list = loadAllProfiles();
@@ -1456,6 +1500,25 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#btn-view-tiers').addEventListener('click', renderTierTable);
   $('#btn-view-weak').addEventListener('click', renderWeak);
   $$('[data-back="home"]').forEach(btn => btn.addEventListener('click', renderHome));
+
+  $('#btn-view-backup').addEventListener('click', renderBackupScreen);
+  $('#btn-goto-restore-onboarding').addEventListener('click', renderBackupScreen);
+  $('#btn-goto-restore-picker').addEventListener('click', renderBackupScreen);
+  $('#btn-copy-backup').addEventListener('click', async () => {
+    const code = $('#backup-export-code').value;
+    try {
+      await navigator.clipboard.writeText(code);
+      alert('복사됐어요! 카톡 같은 곳에 붙여넣어 보관하세요.');
+    } catch (e) {
+      $('#backup-export-code').select();
+      alert('자동 복사가 안 돼서 코드를 직접 선택해뒀어요. 길게 눌러 복사하세요.');
+    }
+  });
+  $('#btn-import-backup').addEventListener('click', () => {
+    const code = $('#backup-import-code').value;
+    if (!code.trim()) { alert('붙여넣은 코드가 없어요.'); return; }
+    importProfileFromCode(code);
+  });
 
   // 초기 화면: 저장된 로컬 프로필 개수에 따라 홈/프로필선택/새프로필 중 하나로 진입
   const init = resolveInitialProfile();

@@ -352,6 +352,30 @@ h2{font-size:20px;margin:6px 0 14px;}
 }
 
 .home-links{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+.backup-link{text-align:center;margin-top:4px;}
+
+.backup-section{
+  background:var(--card);
+  border:1px solid #2a2f52;
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:16px;
+}
+.backup-section h3{margin:0 0 10px;font-size:14px;}
+.backup-textarea{
+  width:100%;
+  background:#0d1024;
+  border:1px solid #2a2f52;
+  border-radius:12px;
+  padding:10px 12px;
+  color:var(--text);
+  font-size:12px;
+  font-family:monospace;
+  resize:none;
+  box-sizing:border-box;
+  margin-bottom:10px;
+}
+.backup-textarea:focus{outline:none;border-color:var(--accent);}
 
 /* Quiz */
 .quiz-progress-wrap{margin:16px 0;}

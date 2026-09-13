@@ -76,6 +76,7 @@
       <img src="assets/npc_owl.jpg" alt="박사 부엉이">
       <div class="npc-tip-bubble"><b>박사 부엉이:</b> 학년을 고르면 오늘의 문제 10개가 바로 나와! 매일 풀면 계급이 쭉쭉 올라가.</div>
     </div>
+    <button id="btn-goto-restore-onboarding" class="link-btn backup-link">이미 다른 기기에 기록이 있나요? 코드로 이어하기</button>
   </section>
 
   <!-- 프로필 선택: 한 기기를 여러 명이 같이 쓸 때 -->
@@ -85,6 +86,7 @@
     <p class="sub">이 기기에 저장된 프로필 중 하나를 골라주세요.</p>
     <div id="profile-list" class="profile-list"></div>
     <button id="btn-add-profile" class="cta-btn">+ 새 프로필 만들기</button>
+    <button id="btn-goto-restore-picker" class="link-btn backup-link">코드로 다른 기록 이어하기</button>
   </section>
 
   <!-- 홈: 티어 대시보드 -->
@@ -115,7 +117,28 @@
     <div class="home-links">
       <button id="btn-view-tiers" class="ghost-btn">전체 등급표 보기</button>
       <button id="btn-view-weak" class="ghost-btn">취약 단원 리포트</button>
+      <button id="btn-view-backup" class="link-btn backup-link">다른 기기로 기록 옮기기 / 백업</button>
     </div>
+  </section>
+
+  <!-- 백업/이어하기: 로그인 없이 기록을 코드로 옮기는 화면 -->
+  <section id="screen-backup" class="screen" hidden>
+    <h2>기록 백업 / 이어하기</h2>
+    <p class="sub">로그인 없이도 이 코드로 기록을 다른 기기(휴대폰, 태블릿 등)로 옮길 수 있어요. 코드를 카톡으로 자신에게 보내두면 언제든 이어할 수 있어요.</p>
+
+    <div class="backup-section">
+      <h3>1. 이 프로필 백업 코드</h3>
+      <textarea id="backup-export-code" class="backup-textarea" readonly rows="4"></textarea>
+      <button id="btn-copy-backup" class="cta-btn">코드 복사하기</button>
+    </div>
+
+    <div class="backup-section">
+      <h3>2. 다른 기기의 코드로 이어하기</h3>
+      <textarea id="backup-import-code" class="backup-textarea" placeholder="여기에 백업 코드를 붙여넣으세요" rows="4"></textarea>
+      <button id="btn-import-backup" class="ghost-btn">코드로 가져오기</button>
+    </div>
+
+    <button class="link-btn back-link" data-back="home">← 홈으로</button>
   </section>
 
   <!-- 퀴즈 화면 -->

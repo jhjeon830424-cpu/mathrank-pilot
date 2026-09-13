@@ -1547,7 +1547,11 @@ document.addEventListener('DOMContentLoaded', () => {
   else showOnboarding('new');
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    // updateViaCache: 'none' — sw.js 파일 자체는 항상 네트워크에서 새로 확인해야
+    // 배포 즉시 새 버전이 감지된다 (브라우저의 HTTP 캐시 때문에 갱신이 늦어지는 것 방지).
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then((reg) => reg.update().catch(() => {}))
+      .catch(() => {});
   }
 
   setTimeout(maybeShowInstallBanner, 1500);

@@ -1391,6 +1391,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch (e) { /* sessionStorage 접근 불가 시 배너 생략 없이 그냥 표시 */ if (isInAppBrowser()) $('#inapp-banner').removeAttribute('hidden'); }
 
+  $('#btn-share-app').addEventListener('click', async () => {
+    const shareUrl = location.origin + location.pathname;
+    const shareData = {
+      title: '매쓰랭크 - 수학 등급전',
+      text: '하루 10문제, 무료로 풀면서 수학 등급 올리기! 같이 해봐요.',
+      url: shareUrl,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (e) { /* 사용자가 취소함 */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('링크가 복사됐어요! 카톡 등에 붙여넣어 보내주세요.');
+    } catch (e) {
+      prompt('아래 링크를 복사해서 보내주세요:', shareUrl);
+    }
+  });
+
   $('#btn-open-external').addEventListener('click', openExternalBrowser);
   $('#btn-dismiss-banner').addEventListener('click', () => {
     $('#inapp-banner').setAttribute('hidden', '');
